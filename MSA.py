@@ -166,8 +166,14 @@ os.environ['pf'] = prot_fam
 os.environ['tx_g'] = tax_gr
 os.environ['db'] = db
 
+# Ask user to specify an output file 
+outputfile = input("What name would you like to call the resulting output file?")
+
+# Define the output file as an OS environment variable 
+os.environ['outputfile'] = outputfile
+
 # Obtain the relevalent protein sequence data for the specified taxonomic group
-cmd6 = 'wget -qO esearch.txt "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=$db&term="$pf[PROT]+AND+$tx_g[ORGN]"&usehistory=y"'
+cmd6 = 'wget -qO $outputfile "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=$db&term="$pf[PROT]+AND+$tx_g[ORGN]"&usehistory=y"'
 subprocess.call(cmd6, shell=True)
 
 # Obtain Query_key and Webenv from that command
@@ -186,16 +192,61 @@ with open("esearch.txt") as fd:
 os.environ['query'] = query
 os.environ['webenv'] = webenv
 
+# Ask user to specify an output file name
+outputfile2 = input("What name would you like to call the resulting output file?")
+
+# Define the output file as an OS environment variable 
+os.environ['outputfile2'] = outputfile2
+
 # Use efetch
-cmd7 = 'wget -qO efetch.fasta "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=$db&query_key=$query&WebEnv=$webenv&rettype=fasta&retmode=text"'
+cmd7 = 'wget -qO $outputfile2 "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=$db&query_key=$query&WebEnv=$webenv&rettype=fasta&retmode=text"'
 subprocess.call(cmd7, shell=True)
 
-#cmd6= 'esearch -db db -query "prot_fam[PROT] AND tax_gr[ORGN]" | efetch -format fasta'
-#subprocess.call(cmd6, shell=True)
-
 # Would they like a summary of their data?
+summary = input("Would you like a summary of the data downloaded? [Yes|No]").upper()
+
+if summary=='YES':
+	print("-----------------------------")
+	print("Summary of the dowloaded data")
+	print("-----------------------------")
+	#Think of some way of displaying the data
+	#Ask if they want to continue
+elif summary=='NO':
+	print("-----------------------------")
+	print("Continuing with the programme...")
+	print("-----------------------------")
+else:
+	print("----------------------------")
+	print("Answer yes or no")
+	print("Terminating the  programme")
+	print("----------------------------")
+	sys.exit()
 
 # Would they like to trim their data?
+trim_data= input("Would you like to filter sequences by a minimum and maximum length? [Yes|No]").upper()
+
+# Could ask if pullseq is installed
+
+if trim_data=="YES":
+	min_l,max_l = input("What minimum and maximum length would you like to filter your sequences by? [Min|Max]").split()
+	print("The minimum length is " + min_l + "the maximum length is " + max_l)
+	os.environ["min_l"] = min_l
+	os.environ["max_l"] = max_l
+	#Maybe ask if this is correct
+	outputfile3 = input("What name would you like to call the resulting output file?")
+	os.environ['outputfile3'] =outputfile3
+	cmd8= 'pullseq -i $outpufile2  -m $min_l  -a $max_l > $outputfile3' 
+	subprocess.call(cmd8, shell=True)
+elif trim_data=="NO":
+	print("----------------------------")
+	print("Continuing with the programme")
+	print("-----------------------------")
+else:
+	print("----------------------------")
+	print("Answer yes or no")
+	print("Terminating the programme")
+	print("--------------------------")
+	sys.exit() 
 
 # Run Clustal
 
