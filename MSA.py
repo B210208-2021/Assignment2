@@ -8,6 +8,7 @@
 # Import All Relevant Modules
 import os, sys, subprocess
 import numpy as np
+import webbrowser
 
 # Print to the screen that Entrez Direct is needed for this proramme to work 
 print("---------------------------------------------------------")
@@ -41,6 +42,29 @@ elif answer=="NO":
 else:
 	print("This prompt requires a Yes or No answer!!")
 
+#Ask user for NCBI account and API key 
+print("------------------------------")
+print("An NCBI account and API key are required for this programme to be excuted well")
+print("Without an NCBI account and API key the programme may throw an error if there are too many requests")
+print("------------------------------")
+
+NCBI = input("Do you have an NCBI account and API key? [Yes/No]").upper()
+
+# If the answer is yes then prompted for the email associated with the NCBI account and the API key
+if NCBI=="YES":
+	email, API_key = input("Please enter your email associated with your NCBI account and API key").split()
+	print("NCBI Email: " + email)
+	print("API Key: " + API_key)
+elif NCBI=="NO":
+	print("Set up an NCBI account and API Key before excuting this programme again")
+        #Open up the URL for the NCBI website in default browser
+	#Open a seperate browser tab for the URL (new=1)
+	#Raise the window (autoraise=True) 
+	webbrowser.open('https://account.ncbi.nlm.nih.gov/signup/?back_url=https%3A%2F%2Fwww.ncbi.nlm.nih.gov%2Fmyncbi%2F',new=1, autoraise=True))
+ 	break
+else: 
+	print("This prompt requires a Yes or No answer!!")
+	break
 
 #while input("Do you have EDirect installed in this environment? [Yes/No]") == "Yes"
 		
