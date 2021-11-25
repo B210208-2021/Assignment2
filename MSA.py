@@ -78,7 +78,81 @@ else:
 	print("Please set up NCBI Account and API key OR re-run the programme")
 	print("Programme termnating...")        
 	print("--------------------------------------")
-	sys.exit()       
+	sys.exit()
+
+# Ask your what database they want to use
+db = input("What database would you like to use for the analysis?").lower()
+
+#Ask if they want information on this database
+ans_db = input("Would you like information on this database?").upper()
+
+if ans_db=="YES":
+	print("--------------------------------------")
+	print("Information on database selected")
+	print("--------------------------------------")
+	#Need to fix this!!!
+	cmd_3 = 'einfo -db  db'
+	subprocess.call(cmd_3, shell=True)
+elif ans_db=="NO":
+	print("--------------------------------------")
+	print("Continuing the programme.....")
+	print("--------------------------------------")
+else:
+	print("---------------------------------------")
+	print("Answer yes or no")
+	print("Programme terminated...")
+	print("---------------------------------------")
+	sys.exit()
+
+# Ask user if they wish to continue
+
+# Ask for the protein family that the user wants to analyse
+prot_fam = input("What Protein Family would you like to analyse?") 
+
+# Ask user if they would like information on this protein family
+ans_prot = input("Would you like information on this protein family? [Yes/No]").upper()
+
+if ans_prot=="YES":
+	print("----------------------------------")
+	print("Information on the protein family selected")
+	print("-----------------------------------")
+	# Add in lines to fetch the pubmed info
+elif ans_prot=="NO":
+	print("---------------------------------")
+	print("Continuing the programme...")
+	print("---------------------------------")
+else: 
+	print("---------------------------------")
+	print("Answer yes or no")
+	print("Programme terminated....")
+	print("----------------------------------")
+	sys.exit()
+
+# Ask if they want to continue
+
+#Ask the user to specify a taxonomic group 
+tax_gr= input("Please specify a taxonomic group you would like to study:").lower()
+
+ans_tax = input("Would you like information on this taxonomic group? [Yes/No]").upper()
+
+if ans_tax=="YES":
+	print("---------------------------------")
+	print("Information on the taxonomic group selected")
+	print("---------------------------------")
+	# Add lines to fetch the info from pubmed
+elif ans_tax=="NO":
+	print("---------------------------------")
+	print("Continuing the programme...")
+	print("---------------------------------")
+else:
+	print("---------------------------------")
+	print("Answer yes or no")
+	print("Programme terminated....")
+	print("------------------------")
+	sys.exit()
+
+# Ask if they want to continue       
+
 
 
 #while input("Do you have EDirect installed in this environment? [Yes/No]") == "Yes"
