@@ -8,6 +8,7 @@
 # Import All Relevant Modules
 import os, sys, subprocess
 import numpy as np
+import re
 import webbrowser
 
 # Print to the screen that Entrez Direct is needed for this proramme to work 
@@ -60,6 +61,8 @@ if NCBI=="YES":
 	email, API_key = input("Please enter your email associated with your NCBI account and API key").split()
 	print("NCBI Email: " + email)
 	print("API Key: " + API_key)
+	#Put the API_key into the bash.profile if not there already*
+	#export NCBI_API_KEY=API_key
 elif NCBI=="NO":
 	print("Set up an NCBI account and API Key before excuting this programme again")
         #Open up the URL for the NCBI website in default browser
@@ -91,8 +94,8 @@ if ans_db=="YES":
 	print("Information on database selected")
 	print("--------------------------------------")
 	#Need to fix this!!!
-	cmd_3 = 'einfo -db  db'
-	subprocess.call(cmd_3, shell=True)
+	#cmd3 = 'einfo -db  db'
+	#subprocess.call(cmd3, shell=True)
 elif ans_db=="NO":
 	print("--------------------------------------")
 	print("Continuing the programme.....")
@@ -117,6 +120,8 @@ if ans_prot=="YES":
 	print("Information on the protein family selected")
 	print("-----------------------------------")
 	# Add in lines to fetch the pubmed info
+	#cmd4 = 'esearch -db pubmed -query prot_fam  | efetch -format abstract'
+	#subprocess.call(cmd4, shell=True)
 elif ans_prot=="NO":
 	print("---------------------------------")
 	print("Continuing the programme...")
@@ -140,6 +145,8 @@ if ans_tax=="YES":
 	print("Information on the taxonomic group selected")
 	print("---------------------------------")
 	# Add lines to fetch the info from pubmed
+	#cmd5 = 'esearch -db pubmed -query tax_gr | efetch -format abstract'
+	#subprocess.call(cmd5, shell=True)
 elif ans_tax=="NO":
 	print("---------------------------------")
 	print("Continuing the programme...")
@@ -154,6 +161,57 @@ else:
 # Ask if they want to continue       
 
 
+#Define the local python varaiables as OS environment variables
+os.environ['pf'] = prot_fam
+os.environ['tx_g'] = tax_gr
+os.environ['db'] = db
+
+# Obtain the relevalent protein sequence data for the specified taxonomic group
+cmd6 = 'wget -qO esearch.txt "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=$db&term="$pf[PROT]+AND+$tx_g[ORGN]"&usehistory=y"'
+subprocess.call(cmd6, shell=True)
+
+# Obtain Query_key and Webenv from that command
+with open("esearch.txt") as fd:
+	for line in fd:
+		m1= re.search(r'(<QueryKey>)(\w+)',line)
+		m2= re.search(r'(<WebEnv>)(\w+)', line)
+		if m1:
+			query= m1.group(2)
+			print(query)	
+		if m2:
+			webenv= m2.group(2)
+			print(webenv)
+
+#Define the local python variables as OS environment variables
+os.environ['query'] = query
+os.environ['webenv'] = webenv
+
+# Use efetch
+cmd7 = 'wget -qO efetch.fasta "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=$db&query_key=$query&WebEnv=$webenv&rettype=fasta&retmode=text"'
+subprocess.call(cmd7, shell=True)
+
+#cmd6= 'esearch -db db -query "prot_fam[PROT] AND tax_gr[ORGN]" | efetch -format fasta'
+#subprocess.call(cmd6, shell=True)
+
+# Would they like a summary of their data?
+
+# Would they like to trim their data?
+
+# Run Clustal
+
+# Determine Level of Protein Conservation
+
+# Plot the Level of Protein Conservation
+
+# Output Plot to the Screen
+
+# Save Plot to Output File
+
+# Ask if they would like to run a BLAST 
+
+# Scan PROSITE database for any known motifs known to be associated with the subset of sequences
+
+ 
 
 #while input("Do you have EDirect installed in this environment? [Yes/No]") == "Yes"
 		
