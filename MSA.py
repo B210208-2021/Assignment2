@@ -40,7 +40,12 @@ elif answer=="NO":
 	cmd_2 = 'export PATH=${PATH}:${HOME}/edirect'
 	subprocess.call(cmd_2, shell=True)
 else:
-	print("This prompt requires a Yes or No answer!!")
+	print("-------------------------------------")
+	print("Yes or No answer")
+	print("Re-run the programme")
+	print("Programme terminating...")
+	print("--------------------------------------")
+	sys.exit()
 
 #Ask user for NCBI account and API key 
 print("------------------------------")
@@ -60,11 +65,21 @@ elif NCBI=="NO":
         #Open up the URL for the NCBI website in default browser
 	#Open a seperate browser tab for the URL (new=1)
 	#Raise the window (autoraise=True) 
-	webbrowser.open('https://account.ncbi.nlm.nih.gov/signup/?back_url=https%3A%2F%2Fwww.ncbi.nlm.nih.gov%2Fmyncbi%2F',new=1, autoraise=True))
- 	break
+	webbrowser.open('https://account.ncbi.nlm.nih.gov/signup/?back_url=https%3A%2F%2Fwww.ncbi.nlm.nih.gov%2Fmyncbi%2F',new=1, autoraise=True)
+        #Exit Programme
+	print("--------------------------------------")
+	print("Please set up NCBI Account and API key")
+	print("Programme terminating...")
+	print("--------------------------------------")
+	sys.exit()
 else: 
-	print("This prompt requires a Yes or No answer!!")
-	break
+	print("--------------------------------------")
+	print("Yes or No answer!!")
+	print("Please set up NCBI Account and API key OR re-run the programme")
+	print("Programme termnating...")        
+	print("--------------------------------------")
+	sys.exit()       
+
 
 #while input("Do you have EDirect installed in this environment? [Yes/No]") == "Yes"
 		
