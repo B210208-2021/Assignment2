@@ -232,10 +232,14 @@ if trim_data=="YES":
 	print("The minimum length is " + min_l + "the maximum length is " + max_l)
 	os.environ["min_l"] = min_l
 	os.environ["max_l"] = max_l
+	cmd_c = 'echo $min_l'
+	subprocess.call(cmd_c, shell=True)
+	cmd_c2 = 'echo $max_l'
+	subprocess.call(cmd_c2, shell=True)
 	#Maybe ask if this is correct
 	outputfile3 = input("What name would you like to call the resulting output file?")
 	os.environ['outputfile3'] =outputfile3
-	cmd8= 'pullseq -i $outpufile2  -m $min_l  -a $max_l > $outputfile3' 
+	cmd8= 'pullseq -i $outputfile2  -m $min_l  -a $max_l > $outputfile3' 
 	subprocess.call(cmd8, shell=True)
 elif trim_data=="NO":
 	print("----------------------------")
