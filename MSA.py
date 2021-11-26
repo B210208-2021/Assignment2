@@ -270,8 +270,19 @@ subprocess.call(cmd11, shell=True)
 # Ask if they would like to run a BLAST 
 
 # Scan PROSITE database for any known motifs known to be associated with the subset of sequences
+with open(f'{outputfile2}') as fd:
+	whole_contents = fd.read()
+	seq = whole_contents.split(">")
+	for sequence in seq:
+		m1= re.search(r'^(\w+)(.*)',sequence)
+		if m1:
+			acc= m1.group(1)
+			os.environ[f'{acc}_p.fa'] = f'{acc}_p.fa'
+			f = open(f'{acc}_p.fa', 'w')
+			f.write(sequence)
 
- 
+cmd12 =  'for FILE in *_p.fa; do patmatmotifs -full -sequence $FILE  -sformat1 fasta  "$FILE".patmatmotifs; done'
+subprocess.call(cmd12, shell=True)
 
 #while input("Do you have EDirect installed in this environment? [Yes/No]") == "Yes"
 		
