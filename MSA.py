@@ -251,16 +251,21 @@ else:
 	print("Terminating the programme")
 	print("--------------------------")
 	sys.exit() 
+# Ask if they would like a summary of the sequences
 
+# Ask what name they would like to give to the output file
+outputfile4 = input("What name would you like to call the resulting output file?") 
+os.environ['outputfile4'] =outputfile4
 # Run Clustal
-
+cmd9 = 'clustalo -i $outputfile3 -o $outputfile4 -t $db --outfmt msf  -v'
+subprocess.call(cmd9, shell=True)
 # Determine Level of Protein Conservation
 
-# Plot the Level of Protein Conservation
-
-# Output Plot to the Screen
-
-# Save Plot to Output File
+# Plot the Level of Protein Conservation- display it and save it
+cmd10 = 'plotcon -sformat msf $outputfile4  -graph x11'
+cmd11  = ' plotcon -sformat msf plotcon.msf -graph ps'
+subprocess.call(cmd10, shell=True)
+subprocess.call(cmd11, shell=True)
 
 # Ask if they would like to run a BLAST 
 
