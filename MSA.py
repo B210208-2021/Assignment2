@@ -61,8 +61,10 @@ if NCBI=="YES":
 	email, API_key = input("Please enter your email associated with your NCBI account and API key").split()
 	print("NCBI Email: " + email)
 	print("API Key: " + API_key)
+	os.environ["API_key"]= API_key
 	#Put the API_key into the bash.profile if not there already*
-	#export NCBI_API_KEY=API_key
+	cmd_e = 'export NCBI_API_KEY= $API_key'
+	subprocess.call(cmd_e, shell=True)
 elif NCBI=="NO":
 	print("Set up an NCBI account and API Key before excuting this programme again")
         #Open up the URL for the NCBI website in default browser
@@ -86,6 +88,9 @@ else:
 # Ask your what database they want to use
 db = input("What database would you like to use for the analysis?").lower()
 
+# Make python variable a variable in BASH 
+os.environ['db'] = db
+
 #Ask if they want information on this database
 ans_db = input("Would you like information on this database?").upper()
 
@@ -94,8 +99,19 @@ if ans_db=="YES":
 	print("Information on database selected")
 	print("--------------------------------------")
 	#Need to fix this!!!
-	#cmd3 = 'einfo -db  db'
-	#subprocess.call(cmd3, shell=True)
+	cmd3 = 'einfo -db $db'
+	subprocess.call(cmd3, shell=True)
+	# Ask user if they wish to continue
+	continue1 = input("Would you like to continue? [Yes|No]").upper()
+	if continue1=="YES":
+        	print("--------------------------------------")
+        	print("Continuing the programme....")
+        	print("--------------------------------------")
+	else:
+        	print("-------------------------------------")
+        	print("Exiting the programme...")
+        	print("-------------------------------------")
+		sys.exit()
 elif ans_db=="NO":
 	print("--------------------------------------")
 	print("Continuing the programme.....")
@@ -107,10 +123,11 @@ else:
 	print("---------------------------------------")
 	sys.exit()
 
-# Ask user if they wish to continue
 
 # Ask for the protein family that the user wants to analyse
 prot_fam = input("What Protein Family would you like to analyse?") 
+
+os.environ['pf'] = prot_fam
 
 # Ask user if they would like information on this protein family
 ans_prot = input("Would you like information on this protein family? [Yes/No]").upper()
@@ -120,8 +137,22 @@ if ans_prot=="YES":
 	print("Information on the protein family selected")
 	print("-----------------------------------")
 	# Add in lines to fetch the pubmed info
-	#cmd4 = 'esearch -db pubmed -query prot_fam  | efetch -format abstract'
-	#subprocess.call(cmd4, shell=True)
+	cmd4 = 'esearch -db pubmed -query $prot_fam  | efetch -format abstract > "$prot_fam".txt'
+	subprocess.call(cmd4, shell=True)
+	cmd_a = 'less $prot_fam.txt'
+	subprocess.call(cmd_a, shell=True)
+	# Ask user if they wish to continue
+	continue1 = input("Would you like to continue? [Yes|No]").upper()
+	if continue1=="YES":
+        	print("--------------------------------------")
+        	print("Continuing the programme....")
+        	print("--------------------------------------")
+	else:
+        	print("-------------------------------------")
+        	print("Exiting the programme...")
+        	print("-------------------------------------")
+	sys.exit()
+
 elif ans_prot=="NO":
 	print("---------------------------------")
 	print("Continuing the programme...")
@@ -133,10 +164,10 @@ else:
 	print("----------------------------------")
 	sys.exit()
 
-# Ask if they want to continue
-
 #Ask the user to specify a taxonomic group 
 tax_gr= input("Please specify a taxonomic group you would like to study:").lower()
+
+os.environ['tx_g'] = tax_gr
 
 ans_tax = input("Would you like information on this taxonomic group? [Yes/No]").upper()
 
@@ -145,8 +176,21 @@ if ans_tax=="YES":
 	print("Information on the taxonomic group selected")
 	print("---------------------------------")
 	# Add lines to fetch the info from pubmed
-	#cmd5 = 'esearch -db pubmed -query tax_gr | efetch -format abstract'
-	#subprocess.call(cmd5, shell=True)
+	cmd5 = 'esearch -db pubmed -query $tax_gr | efetch -format abstract > "$tax_gr".txt'
+	subprocess.call(cmd5, shell=True)
+	cmd_a2 = 'less $tax_gr.txt'
+        subprocess.call(cmd_a2, shell=True)
+        # Ask user if they wish to continue
+        continue1 = input("Would you like to continue? [Yes|No]").upper()
+        if continue1=="YES":
+                print("--------------------------------------")
+                print("Continuing the programme....")
+                print("--------------------------------------")
+        else:
+                print("-------------------------------------")
+                print("Exiting the programme...")
+                print("-------------------------------------")
+		sys.exit()
 elif ans_tax=="NO":
 	print("---------------------------------")
 	print("Continuing the programme...")
@@ -158,16 +202,8 @@ else:
 	print("------------------------")
 	sys.exit()
 
-# Ask if they want to continue       
-
-
-#Define the local python varaiables as OS environment variables
-os.environ['pf'] = prot_fam
-os.environ['tx_g'] = tax_gr
-os.environ['db'] = db
-
 # Ask user to specify an output file 
-outputfile = input("What name would you like to call the resulting output file?")
+outputfile = input("What name would you like to call the resulting output file from esearch?")
 
 # Define the output file as an OS environment variable 
 os.environ['outputfile'] = outputfile
@@ -193,7 +229,7 @@ os.environ['query'] = query
 os.environ['webenv'] = webenv
 
 # Ask user to specify an output file name
-outputfile2 = input("What name would you like to call the resulting output file?")
+outputfile2 = input("What name would you like to call the resulting output file from efetch? (.fasta|.fa)")
 
 # Define the output file as an OS environment variable 
 os.environ['outputfile2'] = outputfile2
@@ -232,12 +268,8 @@ if trim_data=="YES":
 	print("The minimum length is " + min_l + "the maximum length is " + max_l)
 	os.environ["min_l"] = min_l
 	os.environ["max_l"] = max_l
-	cmd_c = 'echo $min_l'
-	subprocess.call(cmd_c, shell=True)
-	cmd_c2 = 'echo $max_l'
-	subprocess.call(cmd_c2, shell=True)
 	#Maybe ask if this is correct
-	outputfile3 = input("What name would you like to call the resulting output file?")
+	outputfile3 = input("What name would you like to call the resulting output file from pullseq?")
 	os.environ['outputfile3'] =outputfile3
 	cmd8= 'pullseq -i $outputfile2  -m $min_l  -a $max_l > $outputfile3' 
 	subprocess.call(cmd8, shell=True)
@@ -253,12 +285,81 @@ else:
 	sys.exit() 
 # Ask if they would like a summary of the sequences
 
+# Would they like a summary of their data?
+summary2 = input("Would you like a summary of the trimmed data? [Yes|No]").upper()
+
+if summary2=='YES':
+        print("-----------------------------")
+        print("Summary of the dowloaded data")
+        print("-----------------------------")
+        #Think of some way of displaying the data
+        #Ask if they want to continue
+elif summary2=='NO':
+        print("-----------------------------")
+        print("Continuing with the programme...")
+        print("-----------------------------")
+else:
+        print("----------------------------")
+        print("Answer yes or no")
+        print("Terminating the  programme")
+        print("----------------------------")
+        sys.exit()
+
 # Ask what name they would like to give to the output file
-outputfile4 = input("What name would you like to call the resulting output file?") 
+outputfile4 = input("What name would you like to call the resulting output file from clustalo?") 
 os.environ['outputfile4'] =outputfile4
 # Run Clustal
 cmd9 = 'clustalo -i $outputfile3 -o $outputfile4 -t $db --outfmt msf  -v'
 subprocess.call(cmd9, shell=True)
+
+# Information on the MSA
+msa = input("Would you like to see information on these multiple sequence alignments? [Yes|No]").upper()
+
+if msa=="YES":
+	outputfile5 = input("What name would you like to call the resulting output file? (.infoalign)")
+	print(outputfile5)
+	os.environ["outputfile5"] = outputfile5
+	cmd_info = 'infoalign $outputfile4 -nousa -outfile $outputfile5'
+	subprocess.call(cmd_info, shell=True)
+	f5 = open(outputfile5, 'r')
+	fc5 = f.read()
+	print (fc5)
+	f.close()
+elif msa=="NO":
+	print("------------------------")
+	print("Continuing the programme...")
+	print("------------------------")
+else:
+	print("------------------------")
+	print("Please Answer Yes or No")
+	print("Terminating the programme")
+	print("------------------------")
+	sys.exit()
+# Show alignments 
+show_a = input("Would you like to see the multiple sequence alignments in order of similarity? [Yes|No]").upper()
+
+if show_a=="YES":
+        outputfile6 = input("What name would you like to call the resulting output file? (.showalign)")
+        print(outputfile6)
+        os.environ["outputfile6"] = outputfile6
+        cmd_s = 'showalign -order=s $outputfile4 -outfile $outputfile6'
+        subprocess.call(cmd_s, shell=True)
+        f6 = open(outputfile6, 'r')
+        fc6 = f.read()
+        print (fc6)
+        f.close()
+elif show_a=="NO":
+        print("------------------------")
+        print("Continuing the programme...")
+        print("------------------------")
+else:
+        print("------------------------")
+        print("Please Answer Yes or No")
+        print("Terminating the programme")
+        print("------------------------")
+        sys.exit()
+# Could ask for similarities and dissimilarities 
+
 # Determine Level of Protein Conservation
 
 # Plot the Level of Protein Conservation- display it and save it
@@ -284,7 +385,6 @@ with open(f'{outputfile2}') as fd:
 cmd12 =  'for FILE in *_p.fa; do patmatmotifs -full -sequence $FILE  -sformat1 fasta  "$FILE".patmatmotifs; done'
 subprocess.call(cmd12, shell=True)
 
-#while input("Do you have EDirect installed in this environment? [Yes/No]") == "Yes"
-		
+
 
 
