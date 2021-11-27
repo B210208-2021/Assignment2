@@ -99,8 +99,13 @@ if ans_db=="YES":
 	print("Information on database selected")
 	print("--------------------------------------")
 	#Need to fix this!!!
-	cmd3 = 'einfo -db $db'
+	cmd3 = 'einfo -db $db > "$db".txt'
 	subprocess.call(cmd3, shell=True)
+	# Print contents of file to the screen
+	file_db= open(f'{db}'.txt, 'r')
+	file_db_contents = file_db.read()
+	print(file_db_contents)
+	file_db.close()
 	# Ask user if they wish to continue
 	continue1 = input("Would you like to continue? [Yes|No]").upper()
 	if continue1=="YES":
@@ -125,7 +130,7 @@ else:
 
 
 # Ask for the protein family that the user wants to analyse
-prot_fam = input("What Protein Family would you like to analyse?") 
+prot_fam = input("What Protein Family would you like to analyse?").lower() 
 
 os.environ['pf'] = prot_fam
 
@@ -137,10 +142,11 @@ if ans_prot=="YES":
 	print("Information on the protein family selected")
 	print("-----------------------------------")
 	# Add in lines to fetch the pubmed info- wiki and then ask of they want the pubmed ids/pubs
-	cmd4 = 'esearch -db pubmed -query $pf  | efetch -format abstract > "$pf".txt'
+	cmd4 = 'esearch -db pubmed -query $pf  | efetch -format medline | gzip  > "$pf".gz'
 	subprocess.call(cmd4, shell=True)
-	cmd_a = 'less $prot_fam.txt'
-	subprocess.call(cmd_a, shell=True)
+	# Display results in a user-controlled manner
+	cmd_p= 'zmore "$pf".gz'
+	xubprocess.call(cmd_p, shell=True)
 	# Ask user if they wish to continue
 	continue1 = input("Would you like to continue? [Yes|No]").upper()
 	if continue1=="YES":
@@ -176,10 +182,10 @@ if ans_tax=="YES":
 	print("Information on the taxonomic group selected")
 	print("---------------------------------")
 	# Add lines to fetch the info from pubmed- Pull wiki and then ask if want pubmed ids stored 
-	cmd5 = 'esearch -db pubmed -query $tax_gr | efetch -format abstract > "$tax_gr".txt'
+	cmd5 = 'esearch -db pubmed -query $tax_gr | efetch -format medline | gzip > "$tax_gr".gz'
 	subprocess.call(cmd5, shell=True)
-	cmd_a2 = 'less $tax_gr.txt'
-	subprocess.call(cmd_a2, shell=True)
+	cmd_t = 'zmore "$tax_gr".gz'
+	subprocess.call(cmd_t, shell=True)
         # Ask user if they wish to continue
 	continue1= input("Would you like to continue? [Yes|No]").upper()
 	if continue1=="YES":
@@ -208,12 +214,23 @@ outputfile = input("What name would you like to call the resulting output file f
 # Define the output file as an OS environment variable 
 os.environ['outputfile'] = outputfile
 
-# Ask if they would like to inculde partial sequences
+# Ask if they would like to inculde partial sequences 
+fmt_esearch= input("Would you like to include partial sequences in this analysis? [Yes|No]").upper()
 
-# Obtain the relevalent protein sequence data for the specified taxonomic group
-cmd6 = 'wget -qO $outputfile "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=$db&term="$pf[PROT]+AND+$tax_gr[ORGN]"&usehistory=y"'
-subprocess.call(cmd6, shell=True)
-
+if fmt_esearch=="YES":
+	# Obtain the relevalent protein sequence data for the specified taxonomic group
+	cmd_e = 'wget -qO $outputfile "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=$db&term="$pf[PROT]+AND+$tax_gr[ORGN]"&usehistory=y"'
+	subprocess.call(cmd_e, shell=True)
+elif fmt_esearch=="NO":
+	# Obtain the relevalent protein sequence data for the specified taxonomic group
+	cmd_e2='wget -qO $outputfile "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=$db&term="$pf[PROT]+AND+$tax_gr[ORGN]+NOT+PARTIAL"&usehistory=y"'
+	subprocess.call(cmd_e2, shell=True)
+else:
+	print("--------------------------")
+	print("Answer yes or no")
+	print("Terminating the programme..")
+	print("--------------------------")
+	sys.exit()
 # Obtain Query_key and Webenv from that command
 with open("esearch.txt") as fd:
 	for line in fd:
@@ -237,9 +254,13 @@ outputfile2 = input("What name would you like to call the resulting output file 
 os.environ['outputfile2'] = outputfile2
 
 # Ask if they would like to limit the number of downloaded sequences- Recommend no more than 1000
+lim= input("What would you like to limit the number of downloads to?\nReccomendation: restrict the number of downloads to no more than 1000")
 
-# Use efetch
-cmd7 = 'wget -qO $outputfile2 "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=$db&query_key=$query&WebEnv=$webenv&rettype=fasta&retmode=text"'
+# Define the lim variable as an OS variable
+os.environ["lim"]= lim
+ 
+# Use efetch to retrieve the fasta files with specified limit on the number of downloads
+cmd7 = 'wget -qO $outputfile2 "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=$db&query_key=$query&WebEnv=$webenv&rettype=fasta&retmode=text&retmax=$lim"'
 subprocess.call(cmd7, shell=True)
 
 # Would they like a summary of their data?
