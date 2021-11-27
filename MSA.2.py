@@ -80,7 +80,7 @@ elif NCBI=="NO":
 else: 
 	print("--------------------------------------")
 	print("Yes or No answer!!")
-	print("Please set up NCBI Account and API key OR re-run the programme")
+	print("Please set up NCBI Account and API key")
 	print("Programme termnating...")        
 	print("--------------------------------------")
 	sys.exit()
@@ -274,14 +274,26 @@ if summary=='YES':
 	file_efetch = open(outputfile2, "r")
 	file_contents_efetch = file_efetch.read()
 	seq_count = file_contents_efetch.count(">")
-	print(seq_count)
+	print("Sequence Count: " + seq_count)
+	
+	# Ask user to specify filename 
+	outputfile_I = input("What name would you like to call the resulting output file? (.infoalign)")
+        print(outputfile_I)
+        os.environ["outputfile_I"] = outputfile_I
+
+
 	# Print Basic info about the file 
-	cmd_i_d = 'infoseq $outputfile2 -nousa > "$db"_"$pf"_"$tax_gr".infoseq'
+	cmd_i_d = 'infoseq $outputfile2 -nousa > $outputfile_I'
 	subprocess.call("cmd_i_d", shell=True)
-	# Try call this in python
-	cmd_call = 'cat "$db"_"$pf"_"$tax_gr".infoseq'
-	subprocess.call(cmd_call, shell=True)
-	#Ask if they want to continue
+
+	# Print file contents to screen
+        f_I = open(outputfile_I, 'r')
+        fc_I = f_I.read()
+        print(fc_I)
+        f_I.close()
+
+
+#Ask if they want to continue
 elif summary=='NO':
 	print("-----------------------------")
 	print("Continuing with the programme...")
@@ -373,8 +385,9 @@ if msa=="YES":
 	subprocess.call(cmd_info, shell=True)
 	f5 = open(outputfile5, 'r')
 	fc5 = f.read()
-	print (fc5)
+	print(fc5)
 	f.close()
+
 elif msa=="NO":
 	print("------------------------")
 	print("Continuing the programme...")
@@ -397,8 +410,9 @@ if show_a=="YES":
         subprocess.call(cmd_s, shell=True)
         f6 = open(outputfile6, 'r')
         fc6 = f.read()
-        print (fc6)
-        f.close()
+        print(fc6)
+        f6.close()
+
 elif show_a=="NO":
         print("------------------------")
         print("Continuing the programme...")
@@ -409,24 +423,69 @@ else:
         print("Terminating the programme")
         print("------------------------")
         sys.exit()
+
 # Could ask for similarities and dissimilarities 
-show_s_d = input("Would you like to see and store the similarities AND|OR dissimilarities? [S|D|B|N]").upper()
+show_s_d = input("Would you like to see and store the similarities AND/OR dissimilarities? [S|D|B|N]").upper()
 
 if show_s_d=="S":
 	print("--------------------------")
 	print("Similarities in Multiple Sequence Alignments")
 	print("--------------------------")
-	#CMD
+
+	# Similarities
+	outputfile_S = input("What name would you like to call the resulting output file? (.showalign)")
+        print(outputfile_S)
+        os.environ["outputfile_S"] = outputfile_S
+	cmd_s_d = 'showalign -show=s $outputfile4 -outfile $outputfile_S'
+	subproces.call(cmd_s_d, shell=True)
+	fs = open(outputfile_S, 'r')
+        fcs = f.read()
+        print(fcs)
+        fs.close()
+
 if show_s_d=="D":
 	print("---------------------------")
 	print("Disimilarities in Multiple Sequence Alignment")
 	print("---------------------------")
-	#CMD
+
+	# Disimilarities
+        outputfile_S = input("What name would you like to call the resulting output file? (.showalign)")
+        print(outputfile_D)
+        os.environ["outputfile_D"] = outputfile_D
+        cmd_s_d = 'showalign -show=s $outputfile4 -outfile $outputfile_D'
+        subproces.call(cmd_s_d, shell=True)
+        fd = open(outputfile_D, 'r')
+        fcd = f.read()
+        print(fcd)
+        fd.close()
+
 if show_s_d=="B":
 	print("---------------------------")
 	print("Similarities and Disimilarities in Multiple Sequence Alignment")
 	print("---------------------------")
-	#CMDS
+
+	# Similarities
+        outputfile_S = input("What name would you like to call the resulting output file? (.showalign)")
+        print(outputfile_S)
+        os.environ["outputfile_S"] = outputfile_S
+        cmd_s_d = 'showalign -show=s $outputfile4 -outfile $outputfile_S'
+        subproces.call(cmd_s_d, shell=True)
+        fs = open(outputfile_S, 'r')
+        fcs = f.read()
+        print(fcs)
+        fs.close()
+
+	# Disimilarities
+        outputfile_S = input("What name would you like to call the resulting output file? (.showalign)")
+        print(outputfile_D)
+        os.environ["outputfile_D"] = outputfile_D
+        cmd_s_d = 'showalign -show=s $outputfile4 -outfile $outputfile_D'
+        subproces.call(cmd_s_d, shell=True)
+        fd = open(outputfile_D, 'r')
+        fcd = f.read()
+        print(fcd)
+        fd.close()
+
 if show_s_d=="N":
 	print("--------------------------")
 	print("Continuing the programme...")
@@ -436,6 +495,7 @@ else:
 	print("Please answer S|D|B|N")
 	print("Terminating the programme....")
 	print("----------------------------")
+	sys.exit()
 # Determine Level of Protein Conservation
 
 # Plot the Level of Protein Conservation- display it and save it
