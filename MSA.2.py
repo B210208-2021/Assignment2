@@ -264,13 +264,23 @@ cmd7 = 'wget -qO $outputfile2 "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efet
 subprocess.call(cmd7, shell=True)
 
 # Would they like a summary of their data?
-summary = input("Would you like a summary of the data downloaded? [Yes|No]").upper()
+summary = input("Would you like a summary of the downloaded data? [Yes|No]").upper()
 
 if summary=='YES':
 	print("-----------------------------")
 	print("Summary of the dowloaded data")
 	print("-----------------------------")
 	#Think of some way of displaying the data
+	file_efetch = open(outputfile2, "r")
+	file_contents_efetch = file_efetch.read()
+	seq_count = file_contents_efetch.count(">")
+	print(seq_count)
+	# Print Basic info about the file 
+	cmd_i_d = 'infoseq $outputfile2 -nousa > "$db"_"$pf"_"$tax_gr".infoseq'
+	subprocess.call("cmd_i_d", shell=True)
+	# Try call this in python
+	cmd_call = 'cat "$db"_"$pf"_"$tax_gr".infoseq'
+	subprocess.call(cmd_call, shell=True)
 	#Ask if they want to continue
 elif summary=='NO':
 	print("-----------------------------")
@@ -305,6 +315,12 @@ if trim_data=="YES":
 		print("Displaying the trimmed data....")
 		print("------------------------------")
 		#Think of some way to display the data
+		file_trimmed = open(outputfile3, "r")
+		file_trimmed_contents = file_trimmed.read()
+		seq_count_t = file_trimmed.count(">")
+		print(seq_count)
+		cmd_i_t = 'infoseq $outputfile3 -nousa > "$db"_"$pf"_"$tax_gr"_trimmed.infoseq'
+		subproces.call(cmd_i_t, shell=True)
 		#Ask if they want to continue
 		continue_t= input("Would you like to continue? [Yes|No]")
 		if continue_t=="YES":
@@ -341,6 +357,7 @@ else:
 outputfile4 = input("What name would you like to call the resulting output file from clustalo? [.msf]")
 print(outputfile4) 
 os.environ['outputfile4'] =outputfile4
+
 # Run Clustal
 cmd9 = 'clustalo -i $outputfile3 -t $db -outfile $outputfile4 --outfmt msf  -v'
 subprocess.call(cmd9, shell=True)
@@ -368,6 +385,7 @@ else:
 	print("Terminating the programme")
 	print("------------------------")
 	sys.exit()
+
 # Show alignments 
 show_a = input("Would you like to see and store the multiple sequence alignments in order of similarity? [Yes|No]").upper()
 
@@ -392,7 +410,32 @@ else:
         print("------------------------")
         sys.exit()
 # Could ask for similarities and dissimilarities 
+show_s_d = input("Would you like to see and store the similarities AND|OR dissimilarities? [S|D|B|N]").upper()
 
+if show_s_d=="S":
+	print("--------------------------")
+	print("Similarities in Multiple Sequence Alignments")
+	print("--------------------------")
+	#CMD
+if show_s_d=="D":
+	print("---------------------------")
+	print("Disimilarities in Multiple Sequence Alignment")
+	print("---------------------------")
+	#CMD
+if show_s_d=="B":
+	print("---------------------------")
+	print("Similarities and Disimilarities in Multiple Sequence Alignment")
+	print("---------------------------")
+	#CMDS
+if show_s_d=="N":
+	print("--------------------------")
+	print("Continuing the programme...")
+	print("--------------------------")
+else:
+	print("---------------------------")
+	print("Please answer S|D|B|N")
+	print("Terminating the programme....")
+	print("----------------------------")
 # Determine Level of Protein Conservation
 
 # Plot the Level of Protein Conservation- display it and save it
@@ -407,11 +450,10 @@ subprocess.call(cmd11, shell=True)
 with open(outputfile2) as fd:
 	whole_contents = fd.read()
 	seq = whole_contents.split("(>)")
-	sequence_s = ''
 	for sequence in seq:
-		sequence_s = sequence.rstrip("\n")	
 		m1= re.search(r'(>)(\w+\.\d)(.*)', sequence_s)
 		if m1:
+			acc= m1.group(2)
 			f= open(f'{acc}_p.fa', 'w')
 			f.write(sequence_s)
 			f.close()
