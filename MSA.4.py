@@ -275,7 +275,7 @@ outputfile2 = input("What name would you like to call the resulting output file 
 os.environ['outputfile2'] = outputfile2
 
 # Ask if they would like to limit the number of downloaded sequences- Recommend no more than 1000
-lim= input("What would you like to limit the number of downloads to?\nReccomendation: restrict the number of downloads to no more than 1000")
+lim= input("What would you like to limit the number of downloads to?\nReccomendation: restrict the number of downloads to no more than 1000\n")
 
 # Define the lim variable as an OS variable
 os.environ["lim"]= lim
@@ -335,8 +335,6 @@ else:
 # Would they like to trim their data?
 trim_data= input("Would you like to filter sequences by a minimum and maximum length? [Yes|No]").upper()
 
-# Could ask if pullseq is installed- If not open the git repository
-
 if trim_data=="YES":
 	installed =  input("Do you have pullseq installed? [Yes|No]/n If not please refer to the user manual and the pullseq github repository").upper() 	
 
@@ -368,15 +366,29 @@ if trim_data=="YES":
 			print("-----------------------------")
 			print("Continuing with the programme")
 			print("-----------------------------")
+			# Ask what name they would like to give to the output file
+			outputfile4= input("What name would you like to call the resulting output file from clustalo? [.msf]")
+			os.environ['outputfile4']= outputfile4
+			# Run Clustalo
+			cmd_ct = 'clustalo -i $outputfile3 -o $outputfile4 --outfmt msf -v'
+			subprocess.call(cmd_ct, shell=True)
 		else:
 			print("----------------------------")
 			print("Terminating the programme...")
 			print("-----------------------------")
 			sys.exit()
+	
 	elif summary2=="NO":
 		print("----------------------------")
 		print("Continuing the programme....")
 		print("----------------------------")
+		# Let the user
+		# Ask what name they would like to give to the output file
+		outputfile4= input("What name would you like to call the resulting output file from clustalo? [.msf]")
+		os.environ['outputfile4']= outputfile4
+		# Run Clustalo
+		cmd_t= 'clustalo -i $outputfile3 -o $outputfile4 --outfmt msf -v'
+		subprocess.call(cmd_t, shell=True)
 	else:
 		print("----------------------------")
 		print("Answer yes or no")
@@ -387,6 +399,16 @@ elif trim_data=="NO":
 	print("----------------------------")
 	print("Continuing with the programme")
 	print("-----------------------------")
+	# Let the user know what steo of the analysis they are on
+	print("##########################################################")
+	print("Generate Sequence Alignments")
+	print("#########################################################")
+	# Ask what name they would like to give to the output file
+	outputfile4= input("What name would you like to call the resulting output file from clustalo? [.msf]")
+	os.environ['outputfile4']= outputfile4
+	# Run Clustalo
+	cmd_nt = 'clustalo -i $outputfile2 - o $outputfile4 --outfmt msf -v'
+	subprocess.call(cmd_nt, shell=True)
 else:
 	print("----------------------------")
 	print("Answer yes or no")
@@ -394,21 +416,8 @@ else:
 	print("--------------------------")
 	sys.exit()
 
-# Let the user know what step of the analysis they are on
-print("###################################################################")
-print("Generate Sequence Aignments")
-print("##################################################################")
 
 # Ask the user if they would like a pairwise or multiple sequence alignment
-
-# Ask what name they would like to give to the output file
-outputfile4 = input("What name would you like to call the resulting output file from clustalo? [.msf]")
-print(outputfile4) 
-os.environ['outputfile4'] =outputfile4
-
-# Run Clustal
-cmd9 = 'clustalo -i $outputfile3 -outfile $outputfile4 --outfmt msf  -v'
-subprocess.call(cmd9, shell=True)
 
 # Information on the MSA
 msa = input("Would you like to see information on these multiple sequence alignments? [Yes|No]").upper()
@@ -550,7 +559,7 @@ else:
 # Determine Level of Protein Conservation
 
 # Plot the Level of Protein Conservation- display it and save it
-win_size = input("What window size would you like to generate the plot with?/nPlease refer to the manual for a description of the winsize parameter")
+win_size = input("What window size would you like to generate the plot with?\nPlease refer to the manual for a description of the winsize parameter")
 os.environ["win_size"]= win_size
 cmd10 = 'plotcon -winsize $win_size -sformat msf $outputfile4  -graph x11'
 subprocess.call(cmd10, shell=True)
