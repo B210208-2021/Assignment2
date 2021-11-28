@@ -12,10 +12,10 @@ import re
 import webbrowser
 
 # Print to the screen that Entrez Direct is needed for this proramme to work 
-print("---------------------------------------------------------")
-print("Warning!!!")
-print("Entrez Direct (EDirect) is needed for this programme to run!!!")
-print("---------------------------------------------------------") 
+print("##############################################################")
+print("Analysis of Protein Families for Specific Taxonomic Groups")
+print("WARNING: Entrez Direct (EDirect) is needed for this programme to run")
+print("##############################################################") 
 
 # Ask User whether they need to install the Entrez
 # Might Later want to change the while loop 
@@ -23,34 +23,31 @@ answer = input("Do you have EDirect installed in this environment? [Yes/No]").up
 
 # If the answer is yes then print "This programme will continue"
 if answer=="YES":
-	print("--------------------")
-	print("This programme will continue")
-	print("--------------------")
+	print("##########################################################################")
+	print("Initiating this Analysis of Protein Families for Specific Taxonomic Groups")
+	print("###########################################################################")
 # If the answer is no then print "Edirect will now be downloaded to this system" (could ask if that is ok) and install programme
 elif answer=="NO":
-	print("--------------------")
+	print("################################################")
 	print("EDirect will now be downloaded to this system")
-	print("This will download a number of scripts and several precoiled prgrams")
-	print("These will be downloaded into an edirect folder in your home directory")
-	print("It may print an additional command for updating the PATH environment variable in your configuration file")
-	print("Answer y and press the Return key if you want it run.")
-	print("If the PATH is already set correctly, or if you prefer to make any editing changes manually, just press Return.")
-	print("--------------------")
+	print("###############################################")
+	# Install EDirect to the OS
 	cmd = 'sh -c "$(wget -q ftp://ftp.ncbi.nlm.nih.gov/entrez/entrezdirect/install-edirect.sh -O -)"'
 	subprocess.call(cmd, shell=True)
+	# Export the filepath
 	cmd_2 = 'export PATH=${PATH}:${HOME}/edirect'
 	subprocess.call(cmd_2, shell=True)
 else:
 	print("-------------------------------------")
-	print("Yes or No answer")
-	print("Re-run the programme")
+	print("Please answer yes or no.")
+	print("Re-run the programme if you would like to run this analysis.")
 	print("Programme terminating...")
 	print("--------------------------------------")
 	sys.exit()
 
 #Ask user for NCBI account and API key 
 print("------------------------------")
-print("An NCBI account and API key are required for this programme to be excuted well")
+print("WARNING: An NCBI account and API key are required for this programme to be excuted")
 print("Without an NCBI account and API key the programme may throw an error if there are too many requests")
 print("------------------------------")
 
@@ -58,13 +55,16 @@ NCBI = input("Do you have an NCBI account and API key? [Yes/No]").upper()
 
 # If the answer is yes then prompted for the email associated with the NCBI account and the API key
 if NCBI=="YES":
+	# Ask user for their email associated with their NCBI account and their API key
 	email, API_key = input("Please enter your email associated with your NCBI account and API key").split()
+	# Print the email associated with their NCBI account
 	print("NCBI Email: " + email)
+	# Print their API Key
 	print("API Key: " + API_key)
+	# Define the inputted API key as an OS variable
 	os.environ["API_key"]= API_key
-	#Put the API_key into the bash.profile if not there already*
-	#cmd_e = 'export NCBI_API_KEY= $API_key'
-	#subprocess.call(cmd_e, shell=True)
+
+# If the answer is no the open up the NCBI website on the page where you set up an account and exit 
 elif NCBI=="NO":
 	print("Set up an NCBI account and API Key before excuting this programme again")
         #Open up the URL for the NCBI website in default browser
@@ -73,15 +73,15 @@ elif NCBI=="NO":
 	webbrowser.open('https://account.ncbi.nlm.nih.gov/signup/?back_url=https%3A%2F%2Fwww.ncbi.nlm.nih.gov%2Fmyncbi%2F',new=1, autoraise=True)
         #Exit Programme
 	print("--------------------------------------")
-	print("Please set up NCBI Account and API key")
-	print("Programme terminating...")
+	print("Please set up NCBI Account and API key before re-running this programme again")
+	print("Terminating this programme...")
 	print("--------------------------------------")
 	sys.exit()
+
 else: 
 	print("--------------------------------------")
-	print("Yes or No answer!!")
-	print("Please set up NCBI Account and API key")
-	print("Programme termnating...")        
+	print("Please answer yes or no")
+	print("Terminating this programme...")        
 	print("--------------------------------------")
 	sys.exit()
 
@@ -95,17 +95,20 @@ os.environ['db'] = db
 ans_db = input("Would you like information on this database?").upper()
 
 if ans_db=="YES":
-	print("--------------------------------------")
-	print("Information on database selected")
-	print("--------------------------------------")
-	#Need to fix this!!!
+	print("######################################")
+	print("Information on the database selected")
+	print("#######################################")
+	
+	# Use EInfo to gather information on the user-inputted database
 	cmd3 = 'einfo -db $db > "$db".txt'
 	subprocess.call(cmd3, shell=True)
+
 	# Print contents of file to the screen
 	file_db= open(f'{db}'.txt, 'r')
 	file_db_contents = file_db.read()
 	print(file_db_contents)
 	file_db.close()
+
 	# Ask user if they wish to continue
 	continue1 = input("Would you like to continue? [Yes|No]").upper()
 	if continue1=="YES":
@@ -117,14 +120,16 @@ if ans_db=="YES":
         	print("Exiting the programme...")
         	print("-------------------------------------")
 		#sys.exit() 
+
 elif ans_db=="NO":
 	print("--------------------------------------")
-	print("Continuing the programme.....")
+	print("Continuing with the analysis.....")
 	print("--------------------------------------")
+
 else:
 	print("---------------------------------------")
-	print("Answer yes or no")
-	print("Programme terminated...")
+	print("Please answer yes or no")
+	print("Termnating this programme..")
 	print("---------------------------------------")
 	sys.exit()
 
@@ -138,20 +143,23 @@ os.environ['pf'] = prot_fam
 ans_prot = input("Would you like information on this protein family? [Yes/No]").upper()
 
 if ans_prot=="YES":
-	print("----------------------------------")
+	print("###########################################")
 	print("Information on the protein family selected")
-	print("-----------------------------------")
+	print("##########################################")
+	
 	# Add in lines to fetch the pubmed info- wiki and then ask of they want the pubmed ids/pubs
 	cmd4 = 'esearch -db pubmed -query $pf  | efetch -format medline | gzip  > "$pf".gz'
 	subprocess.call(cmd4, shell=True)
+	
 	# Display results in a user-controlled manner
 	cmd_p= 'zmore "$pf".gz'
-	xubprocess.call(cmd_p, shell=True)
+	subprocess.call(cmd_p, shell=True)
+	
 	# Ask user if they wish to continue
 	continue1 = input("Would you like to continue? [Yes|No]").upper()
 	if continue1=="YES":
         	print("--------------------------------------")
-        	print("Continuing the programme....")
+        	print("Continuing with the analysis....")
         	print("--------------------------------------")
 	else:
         	print("-------------------------------------")
@@ -161,12 +169,12 @@ if ans_prot=="YES":
 
 elif ans_prot=="NO":
 	print("---------------------------------")
-	print("Continuing the programme...")
+	print("Continuing with the analysis...")
 	print("---------------------------------")
 else: 
 	print("---------------------------------")
 	print("Answer yes or no")
-	print("Programme terminated....")
+	print("Terminating this programme....")
 	print("----------------------------------")
 	sys.exit()
 
@@ -178,14 +186,18 @@ os.environ['tax_gr'] = tax_gr
 ans_tax = input("Would you like information on this taxonomic group? [Yes/No]").upper()
 
 if ans_tax=="YES":
-	print("---------------------------------")
+	print("#################################################")
 	print("Information on the taxonomic group selected")
-	print("---------------------------------")
+	print("#################################################")
+
 	# Add lines to fetch the info from pubmed- Pull wiki and then ask if want pubmed ids stored 
 	cmd5 = 'esearch -db pubmed -query $tax_gr | efetch -format medline | gzip > "$tax_gr".gz'
 	subprocess.call(cmd5, shell=True)
+	
+	# Display results in a user controlled manner
 	cmd_t = 'zmore "$tax_gr".gz'
 	subprocess.call(cmd_t, shell=True)
+
         # Ask user if they wish to continue
 	continue1= input("Would you like to continue? [Yes|No]").upper()
 	if continue1=="YES":
@@ -197,16 +209,23 @@ if ans_tax=="YES":
 		print("Exiting the programme..")
 		print("---------------------------")
 		sys.exit()
+
 elif ans_tax=="NO":
 	print("---------------------------------")
 	print("Continuing the programme...")
 	print("---------------------------------")
+
 else:
 	print("---------------------------------")
 	print("Answer yes or no")
 	print("Programme terminated....")
 	print("------------------------")
 	sys.exit()
+
+# Let the user know what step of the analysis they are on
+print("######################################################################################################")
+print("Using EDirect to retrieve the relevant information for the specified protein family and taxonomic group")
+print("#######################################################################################################") 
 
 # Ask user to specify an output file 
 outputfile = input("What name would you like to call the resulting output file from esearch?")
@@ -227,10 +246,11 @@ elif fmt_esearch=="NO":
 	subprocess.call(cmd_e2, shell=True)
 else:
 	print("--------------------------")
-	print("Answer yes or no")
-	print("Terminating the programme..")
+	print("Please answer yes or no")
+	print("Terminating the analysis..")
 	print("--------------------------")
 	sys.exit()
+
 # Obtain Query_key and Webenv from that command
 with open("esearch.txt") as fd:
 	for line in fd:
@@ -248,7 +268,7 @@ os.environ['query'] = query
 os.environ['webenv'] = webenv
 
 # Ask user to specify an output file name
-outputfile2 = input("What name would you like to call the resulting output file from efetch? (.fasta|.fa)")
+outputfile2 = input("What name would you like to call the resulting output file from efetch? (.fa)")
 
 # Define the output file as an OS environment variable 
 os.environ['outputfile2'] = outputfile2
@@ -267,18 +287,23 @@ subprocess.call(cmd7, shell=True)
 summary = input("Would you like a summary of the downloaded data? [Yes|No]").upper()
 
 if summary=='YES':
-	print("-----------------------------")
+	print("#############################################################")
 	print("Summary of the dowloaded data")
-	print("-----------------------------")
+	print("#############################################################")
 	
 	# Open file and print the number of sequences
 	file_efetch = open(outputfile2, "r")
 	file_contents_efetch = file_efetch.read()
 	seq_count = file_contents_efetch.count(">")
 	print("Sequence Count: " + seq_count)
+
+	# Average length of the sequences
 	
+	# Number of protein sequences per species
+
+
 	# Ask user to specify filename 
-	outputfile_I = input("What name would you like to call the resulting output file? (.infoalign)")
+	outputfile_I = input("What name would you like to call the resulting output file? (.infoseq)")
         print(outputfile_I)
         os.environ["outputfile_I"] = outputfile_I
 
@@ -301,8 +326,8 @@ elif summary=='NO':
 	print("-----------------------------")
 else:
 	print("----------------------------")
-	print("Answer yes or no")
-	print("Terminating the  programme")
+	print("Please answer yes or no")
+	print("Terminating the analysis")
 	print("----------------------------")
 	sys.exit()
 
@@ -365,6 +390,13 @@ else:
 	print("Terminating the programme")
 	print("--------------------------")
 	sys.exit()
+
+# Let the user know what step of the analysis they are on
+print("###################################################################")
+print("Sequence Aignment")
+print("##################################################################")
+
+# Ask the user if they would like a pairwise or multiple sequence alignment
 
 # Ask what name they would like to give to the output file
 outputfile4 = input("What name would you like to call the resulting output file from clustalo? [.msf]")
@@ -519,24 +551,48 @@ else:
 # Determine Level of Protein Conservation
 
 # Plot the Level of Protein Conservation- display it and save it
-cmd10 = 'plotcon -sformat msf $outputfile4  -graph x11'
+win_size = input("What window size would you like to generate the plot with?/nPlease refer to the manual for a description of the winsize parameter")
+os.environ["win_size"]= win_size
+cmd10 = 'plotcon -winsize $win_size -sformat msf $outputfile4  -graph x11'
 subprocess.call(cmd10, shell=True)
 
-save_plot = input
-cmd11  = ' plotcon -sformat msf $outputfile4 -graph x11'
-subprocess.call(cmd10, shell=True)
-subprocess.call(cmd11, shell=True)
-
-# Ask if they would like to run a BLAST 
+save_plot = input("Would you like to save this plot to an output file?[Yes|No]")
+if save_plot=="YES":
+	plot_name= input("What would you like to name the output file for this plot?")
+	os.environ["plot_name"] = plot_name
+	cmd11  = ' plotcon -winsize $win_size -sformat msf $outputfile4 -graph ps -goutfile $plot_name'
+	subprocess.call(cmd11, shell=True)
+else:
+	print("------------------------")
+	print("The Plotcon plot will not be saved to an output file...")
+	print("------------------------")
 
 # Parse the fasta file into individual fasta files
 cmd_split = 'seqretsplit $outputfile2 seqoutall'
 subprocess.call(cmd_split, shell=True)
 
 # Scan PROSITE database for any known motifs known to be associated with the subset of sequences- not looping regex
-cmd12 =  'for FILE in *.fa; do patmatmotifs -full -sequence $FILE  -sformat1 fasta  "$FILE".patmatmotifs; done'
-subprocess.call(cmd12, shell=True)
+# Ask user if they want to report simple patterns
+pat = input("Would you like to include simple patterns in this search? [Yes|No]/nPlease refer to the mannual for description of simple patterns.").upper()
 
+if pat=="YES":
+	print("###########################################################################")
+	print("Scanning PROSITE Database for any known motifs inculding simple patterns...")
+	print"############################################################################")
+	cmd12 = 'for FILE in *.fasta; do patmatmotifs -full -sequence $FILE  -sformat1 fasta  "$(basename "$FILE" .fasta)".patmatmotifs; done'
+	subprocess.call(cmd12, shell=True)
+elif pat=="NO": 
+	print("###########################################################################")
+	print("Scanning PROSITE Database for any nown motifs ignoring simple patterns....")
+	print("###########################################################################")
+	cmd13 ='for FILE in *.fasta; do patmatmotifs -noprune -sequence $FILE  -sformat1 fasta  "$(basename "$FILE" .fasta)".patmatmotifs; done'
+	subprocess.call(cmd13, shell=True)
 
+else:
+	print("-----------------------------------------------------")
+	print("Please answer yes or no")
+	print("Terminating the programme....")
+	print("-----------------------------------------------------")
+	sys.exit()
 
 
