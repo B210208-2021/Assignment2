@@ -17,6 +17,10 @@ print("Analysis of Protein Families for Specific Taxonomic Groups")
 print("WARNING: Entrez Direct (EDirect) is needed for this programme to run")
 print("##############################################################") 
 
+# Define a function for the rest of the script
+def no_answer():
+	print("-------------------------------")
+	print("Please answer yes or no.") 
 # Ask User whether they need to install the Entrez
 # Might Later want to change the while loop 
 answer = input("Do you have EDirect installed in this environment? [Yes/No]").upper()
@@ -38,6 +42,7 @@ elif answer=="NO":
 	cmd_2 = 'export PATH=${PATH}:${HOME}/edirect'
 	subprocess.call(cmd_2, shell=True)
 else:
+	
 	print("-------------------------------------")
 	print("Please answer yes or no.")
 	print("Re-run the programme if you would like to run this analysis.")
@@ -112,16 +117,18 @@ if ans_db=="YES":
 
 	# Ask user if they wish to continue
 	continue1 = input("Would you like to continue? [Yes|No]").upper()
-	if continue1=="YES":
-        	print("--------------------------------------")
-        	print("Continuing the programme....")
-        	print("--------------------------------------")
-	else:
-        	print("-------------------------------------")
-        	print("Exiting the programme...")
-        	print("-------------------------------------")
-		#sys.exit() 
-
+	# Define a function to ask user if they wish to continue
+	def continue_or_not(answer):
+		if answer=="YES":
+			print("------------------------------")
+			print("Continuing the programme.....")
+			print("-----------------------------")
+		else:
+			print("-----------------------------")
+			print("Exiting the programme.....")
+			print("-----------------------------")	
+			sys.exit()
+	continue_or_not(continue1)
 elif ans_db=="NO":
 	print("--------------------------------------")
 	print("Continuing with the analysis.....")
@@ -157,16 +164,8 @@ if ans_prot=="YES":
 	subprocess.call(cmd_p, shell=True)
 	
 	# Ask user if they wish to continue
-	continue1 = input("Would you like to continue? [Yes|No]").upper()
-	if continue1=="YES":
-        	print("--------------------------------------")
-        	print("Continuing with the analysis....")
-        	print("--------------------------------------")
-	else:
-        	print("-------------------------------------")
-        	print("Exiting the programme...")
-        	print("-------------------------------------")
-	sys.exit()
+	continue2 = input("Would you like to continue? [Yes|No]").upper()
+	continue_or_not(continue2)
 
 elif ans_prot=="NO":
 	print("---------------------------------")
@@ -200,16 +199,8 @@ if ans_tax=="YES":
 	subprocess.call(cmd_t, shell=True)
 
         # Ask user if they wish to continue
-	continue1= input("Would you like to continue? [Yes|No]").upper()
-	if continue1=="YES":
-		print("-----------------------------")
-		print("Continuing the programme....")
-		print("----------------------------")
-	else:
-		print("----------------------------")
-		print("Exiting the programme..")
-		print("---------------------------")
-		sys.exit()
+	continue3= input("Would you like to continue? [Yes|No]").upper()
+	continue_or_not(continue3)
 
 elif ans_tax=="NO":
 	print("---------------------------------")
@@ -319,8 +310,10 @@ if summary=='YES':
 	print(fc_I)
 	f_I.close()
 
+	#Ask if they want to continue
+	continue4 = input("Would you like to continue? [Yes|No]").upper()
+	continue_or_not(continue4)
 
-#Ask if they want to continue
 elif summary=='NO':
 	print("-----------------------------")
 	print("Continuing with the programme...")
@@ -366,6 +359,10 @@ if trim_data=="YES":
 			print("-----------------------------")
 			print("Continuing with the programme")
 			print("-----------------------------")
+			# Let the user know what step they are on of the analysis 
+			print("#################################################")
+			print("Generating the Sequence Alignments")
+			print("#################################################") 
 			# Ask what name they would like to give to the output file
 			outputfile4= input("What name would you like to call the resulting output file from clustalo? [.msf]")
 			os.environ['outputfile4']= outputfile4
@@ -382,7 +379,10 @@ if trim_data=="YES":
 		print("----------------------------")
 		print("Continuing the programme....")
 		print("----------------------------")
-		# Let the user
+		# Let the user know what step they are on of the analysis
+		print("###################################################")
+		print("Generating the Sequence Alignments")
+		print("####################################################")
 		# Ask what name they would like to give to the output file
 		outputfile4= input("What name would you like to call the resulting output file from clustalo? [.msf]")
 		os.environ['outputfile4']= outputfile4
@@ -399,9 +399,9 @@ elif trim_data=="NO":
 	print("----------------------------")
 	print("Continuing with the programme")
 	print("-----------------------------")
-	# Let the user know what steo of the analysis they are on
+	# Let the user know what step of the analysis they are on
 	print("##########################################################")
-	print("Generate Sequence Alignments")
+	print("Generating the Sequence Alignments")
 	print("#########################################################")
 	# Ask what name they would like to give to the output file
 	outputfile4= input("What name would you like to call the resulting output file from clustalo? [.msf]")
@@ -424,14 +424,19 @@ msa = input("Would you like to see information on these multiple sequence alignm
 
 if msa=="YES":
 	outputfile5 = input("What name would you like to call the resulting output file? (.infoalign)")
-	print(outputfile5)
+	# Define the python variable as an OS variable
 	os.environ["outputfile5"] = outputfile5
+	# Generate an infoalign file
 	cmd_info = 'infoalign $outputfile4 -nousa -outfile $outputfile5'
 	subprocess.call(cmd_info, shell=True)
-	f5 = open(outputfile5, 'r')
+	# Print the generated file to the screen
+	f5 = open(outputfile5)
 	fc5 = f.read()
 	print(fc5)
 	f.close()
+	# Ask the user do they wish to continue
+	continue5= input("Would you like to continue? [Yes|No]")
+	continue_or_not(continue5)
 
 elif msa=="NO":
 	print("------------------------")
@@ -440,7 +445,7 @@ elif msa=="NO":
 else:
 	print("------------------------")
 	print("Please Answer Yes or No")
-	print("Terminating the programme")
+	print("Terminating the programme....")
 	print("------------------------")
 	sys.exit()
 
@@ -449,14 +454,19 @@ show_a = input("Would you like to see and store the multiple sequence alignments
 
 if show_a=="YES":
         outputfile6 = input("What name would you like to call the resulting output file? (.showalign)")
-        print(outputfile6)
+      	# Define python variable as OS variable
         os.environ["outputfile6"] = outputfile6
+	# Generate MSA showalign in order of similarity
         cmd_s = 'showalign -order=s $outputfile4 -outfile $outputfile6'
         subprocess.call(cmd_s, shell=True)
-        f6 = open(outputfile6, 'r')
+	# Print the contents of the file to the screen
+        f6 = open(outputfile6)
         fc6 = f.read()
         print(fc6)
         f6.close()
+	# Ask the user if they wish to continue
+	continue6= input("Would you like to continue? [Yes|No]").upper()
+	continue_or_not(continue6)
 
 elif show_a=="NO":
         print("------------------------")
@@ -491,6 +501,8 @@ if show_s_d=="S":
 	print(fcs)
 	fs.close()
 	# Ask if they would like to continue
+	continue7= input("Would you like to continue? [Yes|No]")
+	continue_or_not(continue7)
 
 if show_s_d=="D":
 	print("---------------------------")
@@ -511,6 +523,8 @@ if show_s_d=="D":
 	print(fcd)
 	fd.close()
 	# Ask if they wish to continue
+	continue8= input("Would you like to continue? [Yes|No]")
+	continue_or_not(continue8)
 
 if show_s_d=="B":
 	print("---------------------------")
@@ -545,6 +559,8 @@ if show_s_d=="B":
 	print(fcd2)
 	fd2.close()
 	# Ask user if they wish to continue
+	continue9= input("Would you like to continue? [Yes|No]")
+	continue_or_not(continue9)
 
 if show_s_d=="N":
 	print("--------------------------")
