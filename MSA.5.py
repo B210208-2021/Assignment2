@@ -8,6 +8,7 @@
 # Import All Relevant Modules
 import os, sys, subprocess
 import numpy as np
+import pandas as pd
 import re
 import webbrowser
 
@@ -23,7 +24,10 @@ def no_answer():
 	print("Please answer yes or no.") 
 	print("Exiting the programme....")
 	sys.exit()
-
+# Define a function for continuing programme message
+def cont():
+	msg= "--------------------------------\nContinuing with this analysis\n--------------------------------"
+	return msg
 
 # Ask User whether they need to install the Entrez
 answer = input("Do you have EDirect installed in this environment? [Yes/No]").upper()
@@ -113,9 +117,9 @@ if ans_db=="YES":
 	# Define a function to ask user if they wish to continue
 	def continue_or_not(answer):
 		if answer=="YES":
-			print("------------------------------")
-			print("Continuing the programme.....")
-			print("-----------------------------")
+			print("--------------------------------")
+			print("Continuing with this analysis...")
+			print("--------------------------------")
 		else:
 			print("-----------------------------")
 			print("Exiting the programme.....")
@@ -123,9 +127,7 @@ if ans_db=="YES":
 			sys.exit()
 	continue_or_not(continue1)
 elif ans_db=="NO":
-	print("--------------------------------------")
-	print("Continuing with the analysis.....")
-	print("--------------------------------------")
+	print(cont())
 
 else:
 	print(no_answer())
@@ -157,9 +159,7 @@ if ans_prot=="YES":
 	continue_or_not(continue2)
 
 elif ans_prot=="NO":
-	print("---------------------------------")
-	print("Continuing with the analysis...")
-	print("---------------------------------")
+	print(cont())
 else: 
 	print(no_answer())
 
@@ -188,9 +188,7 @@ if ans_tax=="YES":
 	continue_or_not(continue3)
 
 elif ans_tax=="NO":
-	print("---------------------------------")
-	print("Continuing the programme...")
-	print("---------------------------------")
+	print(cont())
 
 else:
 	print(no_answer())
@@ -261,28 +259,56 @@ if summary=='YES':
 	print("#############################################################")
 	
 	# Open file and print the number of sequences
-	file_efetch = open(outputfile2, "r")
+	file_efetch = open(outputfile2)
 	file_contents_efetch = file_efetch.read()
 	seq_count = file_contents_efetch.count(">")
-	print("Sequence Count: " + seq_count)
+	print("Sequence Count: " + str(seq_count))
 
-	# Average length of the sequences
-	
-	# Number of protein sequences per species
+	# Number of Proteins per species and the average length of sequences 
+	# Define empty lists
+	header = []
+	seqs= []
+	species_names= []
+	# Open the EFetch generated file
+	with open(outputfile2) as fa:
+		# Loop through each line of the file
+		for line in fa:
+			# Initialize an empty string for n_h_seq
+			no_h_seq= ''
+			# Remove the newline characters at the end of the sequence
+			sequence= line.split("\n")
+			#Loop over the sequence
+			for seq in sequence:
+				# If the sequence starts with > then its a header line
+				if seq.startswith(">"):
+					if "[" in seq:
+						header.append(seq)
+						m3= re.search(r'(?<=\[)(.*?)(?=\])', seq)
+					if m3:
+						species= m3.group(0)
+						species_names.append(species)
+				if not seq.startswith(">"):
+					no_h_seq += seq
+					seqs.append(no_h_seq)
 
+	# Number of protein sequences for each species
+	# Create a pandas series
+	s_count = pd.Series(species_names)
+	uniq_s_count = s_count.value_counts()
+	print(uniq_s_count)
 
 	# Ask user to specify filename 
-	outputfile_I = input("What name would you like to call the resulting output file? (.infoseq)")  
+	info_i = input("What name would you like to call the resulting output file? (.infoseq)")  
         # Define python variable as OS variable
-	os.environ["outputfile_I"]= outputfile_I
+	os.environ["info_i"]= info_i
 
 
 	# Print Basic info about the file 
-	cmd_i_d = 'infoseq $outputfile2 -nousa > $outputfile_I'
+	cmd_i_d = 'infoseq $outputfile2 -nousa -outfile $info_i'
 	subprocess.call("cmd_i_d", shell=True)
 
 	# Print file contents to screen
-	f_I= open(outputfile_I)
+	f_I= open(info_i)
 	fc_I= f_I.read()
 	print(fc_I)
 	f_I.close()
@@ -292,9 +318,7 @@ if summary=='YES':
 	continue_or_not(continue4)
 
 elif summary=='NO':
-	print("-----------------------------")
-	print("Continuing with the programme...")
-	print("-----------------------------")
+	print(cont())
 else:
 	print(no_answer())
 
@@ -316,22 +340,26 @@ if trim_data=="YES":
 	# Ask if they would like a summary of the trimmed data
 	summary2 = imput("Would you like a summary of the trimmed data? [Yes|No]").upper()
 	if summary2=="YES":
-		print("----------------------------------")
-		print("Displaying the trimmed data....")
-		print("------------------------------")
+		print("#####################################")
+		print("Displaying the trimmed data.")
+		print("#####################################")
 		#Think of some way to display the data
-		file_trimmed = open(outputfile3, "r")
+		file_trimmed = open(outputfile3)
 		file_trimmed_contents = file_trimmed.read()
 		seq_count_t = file_trimmed.count(">")
-		print(seq_count)
-		cmd_i_t = 'infoseq $outputfile3 -nousa > "$db"_"$pf"_"$tax_gr"_trimmed.infoseq'
+		print("Sequence count is:" + str(seq_count))
+		#ADD IN THE SPECIES COUNT!!!
+		# Ask user to specify filename for infoseq
+		info_t= input("What would you like to name the resulting output file?")
+		# Define the python variable as an OS variable 
+		os.environ['info_t'] = info_t
+		# Generate the infoseq file
+		cmd_i_t = 'infoseq $outputfile3 -nousa -outfile $info_t'
 		subproces.call(cmd_i_t, shell=True)
 		#Ask if they want to continue
 		continue_t= input("Would you like to continue? [Yes|No]")
 		if continue_t=="YES":
-			print("-----------------------------")
-			print("Continuing with the programme")
-			print("-----------------------------")
+			print(cont())
 			# Let the user know what step they are on of the analysis 
 			print("#################################################")
 			print("Generating the Sequence Alignments")
@@ -346,9 +374,7 @@ if trim_data=="YES":
 			print(no_answer())
 	
 	elif summary2=="NO":
-		print("----------------------------")
-		print("Continuing the programme....")
-		print("----------------------------")
+		print(cont())
 		# Let the user know what step they are on of the analysis
 		print("###################################################")
 		print("Generating the Sequence Alignments")
@@ -362,9 +388,7 @@ if trim_data=="YES":
 	else:
 		print(no_answer())
 elif trim_data=="NO":
-	print("----------------------------")
-	print("Continuing with the programme")
-	print("-----------------------------")
+	print(cont())
 	# Let the user know what step of the analysis they are on
 	print("##########################################################")
 	print("Generating the Sequence Alignments")
@@ -372,8 +396,10 @@ elif trim_data=="NO":
 	# Ask what name they would like to give to the output file
 	outputfile4= input("What name would you like to call the resulting output file from clustalo? [.msf]")
 	os.environ['outputfile4']= outputfile4
+	cmd_check='echo $outputfile4'
+	subprocess.call(cmd_check, shell=True)
 	# Run Clustalo
-	cmd_nt = 'clustalo -i $outputfile2 - o $outputfile4 --outfmt msf -v'
+	cmd_nt = 'clustalo -i $outputfile2 -o $outputfile4 --outfmt msf -v'
 	subprocess.call(cmd_nt, shell=True)
 else:
 	print(no_answer())
@@ -401,9 +427,7 @@ if msa=="YES":
 	continue_or_not(continue5)
 
 elif msa=="NO":
-	print("------------------------")
-	print("Continuing the programme...")
-	print("------------------------")
+	print(cont())
 else:
 	print(no_answer())
 
@@ -422,14 +446,13 @@ if show_a=="YES":
         fc6 = f.read()
         print(fc6)
         f6.close()
+	
 	# Ask the user if they wish to continue
-	continue6= input("Would you like to continue? [Yes|No]").upper()
-	continue_or_not(continue6)
+	#cont6= input("Would you like to continue? [Yes|No]").upper()
+	#continue_or_not(cont6)
 
 elif show_a=="NO":
-        print("------------------------")
-        print("Continuing the programme...")
-        print("------------------------")
+        print(cont())
 else:
         print(no_answer())
 
@@ -517,17 +540,13 @@ if show_s_d=="B":
 	continue_or_not(continue9)
 
 if show_s_d=="N":
-	print("--------------------------")
-	print("Continuing the programme...")
-	print("--------------------------")
+	print(cont())
 else:
 	print("---------------------------")
 	print("Please answer S|D|B|N")
 	print("Terminating the programme....")
 	print("----------------------------")
 	sys.exit()
-# Determine Level of Protein Conservation
-
 # Plot the Level of Protein Conservation- display it and save it
 win_size = input("What window size would you like to generate the plot with?\nPlease refer to the manual for a description of the winsize parameter")
 os.environ["win_size"]= win_size
