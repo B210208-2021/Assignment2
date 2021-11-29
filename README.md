@@ -8,8 +8,8 @@ The full details of the assignment can be found on the [BPSM website](https://ww
 
 ### Workflow For this Assignment
 
-**Simple Schematic to represent the steps taken n this script:**
-![Workflow](https://ibb.co/JFsVGkx)
+**Simple Schematic to represent the steps taken in this script:**
+[![Workflow](https://i.postimg.cc/Kj73ZG3Y/Untitled-14.png)](https://postimg.cc/sGXgmRcF)
 
 
 
